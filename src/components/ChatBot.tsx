@@ -35,10 +35,10 @@ export function ChatBot() {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isOpen) {
       const greeting = language === "en" 
         ? "Hello! I'm Asthi Bot, your bone health assistant. How can I help you today?"
-        : "नमस्ते! मैं अस्थि बॉट हूं, आपका हड्डी स्वास्थ्य सहायक। आज मैं आपकी कैसे मदद कर सकता हूं?";
+        : "नमस्ते! मैं अस्थि बॉट हूं, आपका हड्डी स्वास्थ्य सहायक। आप चाहे English में लिखें या Hindi में, मैं आपको हिंदी में जवाब दूंगा। आज मैं आपकी कैसे मदद कर सकता हूं?";
       
       setMessages([{
         id: Date.now().toString(),

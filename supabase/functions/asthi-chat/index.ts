@@ -19,8 +19,17 @@ serve(async (req) => {
     }
 
     const systemPrompt = language === "hi"
-      ? `आप अस्थि बॉट हैं, एक सहायक हड्डी स्वास्थ्य सहायक। संक्षिप्त और स्पष्ट उत्तर दें। कोई विशेष वर्ण न उपयोग करें।`
-      : `You are Asthi Bot, a helpful bone health assistant. Keep responses concise. Do not use special characters.`;
+      ? `आप अस्थि बॉट हैं, एक हड्डी स्वास्थ्य सहायक। 
+
+महत्वपूर्ण निर्देश:
+- हमेशा हिंदी में जवाब दें, चाहे user English में लिखे या Hindi में
+- Hinglish style use करें जो local Indian Hindi speakers बोलते हैं
+- सभी responses हिंदी script (देवनागरी) में लिखें
+- Simple और friendly tone रखें
+- Medical terms को आसान हिंदी में समझाएं
+- कोई special characters या emojis use न करें
+- हड्डियों की सेहत, osteoporosis, calcium, vitamin D, exercise के बारे में मदद करें`
+      : `You are Asthi Bot, a helpful bone health assistant. Keep responses concise and friendly. Help users understand osteoporosis, bone density, calcium, vitamin D, and exercise. Do not use special characters or emojis.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
