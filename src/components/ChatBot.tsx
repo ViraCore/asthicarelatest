@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, X, Send, Mic, MicOff, Volume2, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Mic, MicOff, Volume2, VolumeX, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -190,6 +190,14 @@ export function ChatBot() {
     }
   };
 
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsSpeaking(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(input);
@@ -299,11 +307,23 @@ export function ChatBot() {
               </Button>
             </form>
 
-            {/* Speaking Indicator */}
+            {/* Speaking Indicator with Stop Button */}
             {isSpeaking && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                <Volume2 className="w-3 h-3 animate-pulse" />
-                <span>{language === "en" ? "Speaking..." : "बोल रहा है..."}</span>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Volume2 className="w-3 h-3 animate-pulse" />
+                  <span>{language === "en" ? "Speaking..." : "बोल रही है..."}</span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={stopSpeaking}
+                  className="h-6 px-2 text-xs"
+                >
+                  <VolumeX className="w-3 h-3 mr-1" />
+                  {language === "en" ? "Stop" : "रोकें"}
+                </Button>
               </div>
             )}
           </div>
