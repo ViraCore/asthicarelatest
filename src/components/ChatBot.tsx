@@ -55,7 +55,19 @@ export function ChatBot() {
         body: { text, language },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("TTS error:", error);
+        setIsSpeaking(false);
+        // Silently fail - chatbot continues without voice
+        return;
+      }
+
+      if (data?.error) {
+        console.error("TTS API error:", data.error);
+        setIsSpeaking(false);
+        // Silently fail - chatbot continues without voice
+        return;
+      }
 
       if (data?.audioContent) {
         const audioBlob = new Blob(
@@ -72,10 +84,13 @@ export function ChatBot() {
         audioRef.current.onended = () => setIsSpeaking(false);
         audioRef.current.onerror = () => setIsSpeaking(false);
         await audioRef.current.play();
+      } else {
+        setIsSpeaking(false);
       }
     } catch (error) {
       console.error("TTS error:", error);
       setIsSpeaking(false);
+      // Silently fail - chatbot continues without voice
     }
   };
 
