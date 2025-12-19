@@ -4,98 +4,118 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Play, Clock, Star, Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, Play, Star, Eye, X } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const categories = [
-  "All",
-  "Nutrition",
-  "Exercise",
-  "Rehabilitation",
-  "Fall Prevention",
-  "Understanding BMD",
-];
+interface Video {
+  id: number;
+  youtubeId: string;
+  title: { en: string; hi: string };
+  category: string;
+  views: number;
+  rating: number;
+}
 
-const videos = [
+const videos: Video[] = [
   {
     id: 1,
-    title: "Understanding Your T-Score Results",
+    youtubeId: "T6Se7kOJdSQ",
+    title: {
+      en: "Understanding Osteoporosis - Bone Health Explained",
+      hi: "ऑस्टियोपोरोसिस को समझना - हड्डियों का स्वास्थ्य",
+    },
     category: "Understanding BMD",
-    duration: "8:24",
-    views: 12500,
+    views: 125000,
     rating: 4.9,
-    thumbnail: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=225&fit=crop",
   },
   {
     id: 2,
-    title: "Essential Calcium-Rich Foods for Strong Bones",
+    youtubeId: "4J9G8eWu5Is",
+    title: {
+      en: "Calcium Rich Foods for Strong Bones",
+      hi: "मजबूत हड्डियों के लिए कैल्शियम युक्त आहार",
+    },
     category: "Nutrition",
-    duration: "12:30",
-    views: 8900,
+    views: 89000,
     rating: 4.8,
-    thumbnail: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=225&fit=crop",
   },
   {
     id: 3,
-    title: "Safe Weight-Bearing Exercises at Home",
+    youtubeId: "aUaInS6HIGo",
+    title: {
+      en: "Best Exercises for Bone Health - Senior Friendly",
+      hi: "हड्डियों के स्वास्थ्य के लिए सर्वोत्तम व्यायाम",
+    },
     category: "Exercise",
-    duration: "15:45",
-    views: 15200,
+    views: 152000,
     rating: 4.9,
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop",
   },
   {
     id: 4,
-    title: "Post-Fracture Rehabilitation Guide",
+    youtubeId: "uGEL8lmZFXc",
+    title: {
+      en: "Physiotherapy for Bone Recovery",
+      hi: "हड्डी की रिकवरी के लिए फिजियोथेरेपी",
+    },
     category: "Rehabilitation",
-    duration: "20:10",
-    views: 6700,
+    views: 67000,
     rating: 4.7,
-    thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=225&fit=crop",
   },
   {
     id: 5,
-    title: "Home Safety Tips to Prevent Falls",
+    youtubeId: "PFkDJI64zAk",
+    title: {
+      en: "Fall Prevention Tips for Elderly",
+      hi: "बुजुर्गों के लिए गिरने से बचाव के टिप्स",
+    },
     category: "Fall Prevention",
-    duration: "10:15",
-    views: 9300,
+    views: 93000,
     rating: 4.8,
-    thumbnail: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=225&fit=crop",
   },
   {
     id: 6,
-    title: "Vitamin D: Why It Matters for Bones",
+    youtubeId: "RLHdkV8WWQI",
+    title: {
+      en: "Vitamin D and Bone Health Connection",
+      hi: "विटामिन डी और हड्डियों के स्वास्थ्य का संबंध",
+    },
     category: "Nutrition",
-    duration: "9:42",
-    views: 11000,
+    views: 110000,
     rating: 4.9,
-    thumbnail: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=400&h=225&fit=crop",
   },
   {
     id: 7,
-    title: "Balance Training for Seniors",
+    youtubeId: "5N1JxDpT-wk",
+    title: {
+      en: "Yoga Exercises for Strong Bones",
+      hi: "मजबूत हड्डियों के लिए योग व्यायाम",
+    },
     category: "Exercise",
-    duration: "14:20",
-    views: 7800,
+    views: 78000,
     rating: 4.6,
-    thumbnail: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=225&fit=crop",
   },
   {
     id: 8,
-    title: "Reading Your DEXA Scan Report",
+    youtubeId: "bSvovGB_O44",
+    title: {
+      en: "How to Read Your DEXA Scan Report",
+      hi: "अपनी DEXA स्कैन रिपोर्ट कैसे पढ़ें",
+    },
     category: "Understanding BMD",
-    duration: "11:35",
-    views: 14500,
+    views: 145000,
     rating: 4.9,
-    thumbnail: "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&h=225&fit=crop",
   },
   {
     id: 9,
-    title: "Physical Therapy After Hip Surgery",
+    youtubeId: "GIBXMIoGXWU",
+    title: {
+      en: "Post Surgery Rehabilitation Exercises",
+      hi: "सर्जरी के बाद पुनर्वास व्यायाम",
+    },
     category: "Rehabilitation",
-    duration: "18:50",
-    views: 5200,
+    views: 52000,
     rating: 4.7,
-    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop",
   },
 ];
 
@@ -109,9 +129,21 @@ function formatViews(views: number): string {
 const Education = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const { language, t } = useLanguage();
+
+  const categories = [
+    { key: "All", label: t("category.all") },
+    { key: "Nutrition", label: t("category.nutrition") },
+    { key: "Exercise", label: t("category.exercise") },
+    { key: "Rehabilitation", label: t("category.rehabilitation") },
+    { key: "Fall Prevention", label: t("category.fallPrevention") },
+    { key: "Understanding BMD", label: t("category.understandingBMD") },
+  ];
 
   const filteredVideos = videos.filter((video) => {
-    const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const title = video.title[language];
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All" || video.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -124,11 +156,10 @@ const Education = () => {
           {/* Header */}
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Education Center
+              {t("education.title")}
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore our library of expert-curated videos on bone health, nutrition, 
-              exercise, and rehabilitation.
+              {t("education.subtitle")}
             </p>
           </div>
 
@@ -137,7 +168,7 @@ const Education = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search videos..."
+              placeholder={t("education.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-12 text-base"
@@ -148,12 +179,12 @@ const Education = () => {
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {categories.map((category) => (
               <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
+                key={category.key}
+                variant={selectedCategory === category.key ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedCategory(category)}
+                onClick={() => setSelectedCategory(category.key)}
               >
-                {category}
+                {category.label}
               </Button>
             ))}
           </div>
@@ -165,40 +196,41 @@ const Education = () => {
                 key={video.id}
                 className="overflow-hidden hover:shadow-soft transition-all duration-300 group cursor-pointer animate-fade-in"
                 style={{ animationDelay: `${index * 0.05}s` }}
+                onClick={() => setSelectedVideo(video)}
               >
                 {/* Thumbnail */}
                 <div className="relative aspect-video overflow-hidden">
                   <img
-                    src={video.thumbnail}
-                    alt={video.title}
+                    src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                    alt={video.title[language]}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+                    }}
                   />
                   <div className="absolute inset-0 bg-foreground/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
                       <Play className="w-6 h-6 text-primary-foreground fill-primary-foreground ml-1" />
                     </div>
                   </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-foreground/80 rounded text-xs text-background font-medium">
-                    {video.duration}
-                  </div>
                 </div>
 
                 <CardContent className="p-4">
                   {/* Category Badge */}
                   <span className="text-xs px-2 py-1 bg-accent rounded text-accent-foreground">
-                    {video.category}
+                    {categories.find((c) => c.key === video.category)?.label}
                   </span>
 
                   {/* Title */}
                   <h3 className="font-semibold text-foreground mt-3 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                    {video.title}
+                    {video.title[language]}
                   </h3>
 
                   {/* Stats */}
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Eye className="w-4 h-4" />
-                      {formatViews(video.views)} views
+                      {formatViews(video.views)} {t("education.views")}
                     </div>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-warning text-warning" />
@@ -213,7 +245,7 @@ const Education = () => {
           {/* No Results */}
           {filteredVideos.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground">No videos found matching your search.</p>
+              <p className="text-muted-foreground">{t("education.noResults")}</p>
               <Button
                 variant="outline"
                 className="mt-4"
@@ -222,13 +254,37 @@ const Education = () => {
                   setSelectedCategory("All");
                 }}
               >
-                Clear Filters
+                {t("education.clearFilters")}
               </Button>
             </div>
           )}
         </div>
       </main>
       <Footer />
+
+      {/* Video Player Dialog */}
+      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle className="pr-8">
+              {selectedVideo?.title[language]}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="aspect-video">
+            {selectedVideo && (
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1`}
+                title={selectedVideo.title[language]}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="border-0"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

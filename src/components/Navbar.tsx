@@ -1,17 +1,23 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Activity, Menu, X } from "lucide-react";
+import { Activity, Menu, X, Globe } from "lucide-react";
 import { useState } from "react";
-
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Education Center", path: "/education" },
-  { name: "Sarcopenia Assessment", path: "/sarcopenia-assessment" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Navbar() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
+
+  const navLinks = [
+    { name: t("nav.home"), path: "/" },
+    { name: t("nav.education"), path: "/education" },
+    { name: t("nav.assessment"), path: "/sarcopenia-assessment" },
+  ];
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "hi" : "en");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -42,24 +48,44 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* Language Toggle & CTA Button */}
+          <div className="hidden md:flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="gap-2"
+            >
+              <Globe className="w-4 h-4" />
+              {language === "en" ? "हिंदी" : "English"}
+            </Button>
             <Button asChild>
-              <Link to="/sarcopenia-assessment">Get Started</Link>
+              <Link to="/sarcopenia-assessment">{t("nav.getStarted")}</Link>
             </Button>
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-foreground" />
-            ) : (
-              <Menu className="w-6 h-6 text-foreground" />
-            )}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="gap-1 px-2"
+            >
+              <Globe className="w-4 h-4" />
+              {language === "en" ? "हि" : "En"}
+            </Button>
+            <button
+              className="p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-foreground" />
+              ) : (
+                <Menu className="w-6 h-6 text-foreground" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -82,7 +108,7 @@ export function Navbar() {
               ))}
               <Button asChild className="w-full">
                 <Link to="/sarcopenia-assessment" onClick={() => setMobileMenuOpen(false)}>
-                  Get Started
+                  {t("nav.getStarted")}
                 </Link>
               </Button>
             </div>

@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Activity, Mail, Phone, MapPin } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-secondary border-t border-border">
       <div className="container mx-auto px-4 py-12">
@@ -15,33 +18,32 @@ export function Footer() {
               <span className="text-xl font-bold text-foreground">Asthi Care</span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-md">
-              Empowering your bone health journey with expert guidance, educational resources, 
-              and personalized assessments. Your trusted partner in osteoporosis care.
+              {t("footer.description")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Quick Links</h4>
+            <h4 className="font-semibold text-foreground mb-4">{t("footer.quickLinks")}</h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/education" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Education Center
+                  {t("nav.education")}
                 </Link>
               </li>
               <li>
                 <Link to="/sarcopenia-assessment" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Sarcopenia Assessment
+                  {t("nav.assessment")}
                 </Link>
               </li>
               <li>
                 <a href="#specialists" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Find a Specialist
+                  {t("footer.findSpecialist")}
                 </a>
               </li>
               <li>
                 <a href="#faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  FAQs
+                  {t("footer.faqs")}
                 </a>
               </li>
             </ul>
@@ -49,7 +51,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Contact</h4>
+            <h4 className="font-semibold text-foreground mb-4">{t("footer.contact")}</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
@@ -69,7 +71,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Asthi Care. All rights reserved.
+            © {new Date().getFullYear()} Asthi Care. {t("footer.rights")}
           </p>
         </div>
       </div>

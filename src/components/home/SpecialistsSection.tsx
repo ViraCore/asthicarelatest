@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Phone, Calendar, MapPin } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const specialists = [
   {
     id: 1,
     name: "Dr. Priya Sharma",
-    specialty: "Orthopedic Surgeon",
-    location: "Mumbai, Maharashtra",
+    specialty: { en: "Orthopedic Surgeon", hi: "आर्थोपेडिक सर्जन" },
+    location: { en: "Mumbai, Maharashtra", hi: "मुंबई, महाराष्ट्र" },
     rating: 4.9,
     reviews: 234,
     available: true,
@@ -16,8 +17,8 @@ const specialists = [
   {
     id: 2,
     name: "Dr. Rajesh Kumar",
-    specialty: "Rheumatologist",
-    location: "Delhi, NCR",
+    specialty: { en: "Rheumatologist", hi: "रुमेटोलॉजिस्ट" },
+    location: { en: "Delhi, NCR", hi: "दिल्ली, NCR" },
     rating: 4.8,
     reviews: 189,
     available: true,
@@ -26,8 +27,8 @@ const specialists = [
   {
     id: 3,
     name: "Dr. Anjali Desai",
-    specialty: "Endocrinologist",
-    location: "Bangalore, Karnataka",
+    specialty: { en: "Endocrinologist", hi: "एंडोक्राइनोलॉजिस्ट" },
+    location: { en: "Bangalore, Karnataka", hi: "बैंगलोर, कर्नाटक" },
     rating: 4.9,
     reviews: 312,
     available: false,
@@ -36,8 +37,8 @@ const specialists = [
   {
     id: 4,
     name: "Dr. Vikram Singh",
-    specialty: "Physical Medicine",
-    location: "Chennai, Tamil Nadu",
+    specialty: { en: "Physical Medicine", hi: "शारीरिक चिकित्सा" },
+    location: { en: "Chennai, Tamil Nadu", hi: "चेन्नई, तमिलनाडु" },
     rating: 4.7,
     reviews: 156,
     available: true,
@@ -46,16 +47,38 @@ const specialists = [
 ];
 
 export function SpecialistsSection() {
+  const { language } = useLanguage();
+
+  const translations = {
+    en: {
+      title: "Find a Specialist",
+      subtitle: "Connect with top-rated bone health specialists near you. Get expert consultations and personalized treatment plans.",
+      available: "Available",
+      reviews: "reviews",
+      call: "Call",
+      book: "Book",
+    },
+    hi: {
+      title: "विशेषज्ञ खोजें",
+      subtitle: "अपने पास के शीर्ष-रेटेड हड्डी स्वास्थ्य विशेषज्ञों से जुड़ें। विशेषज्ञ परामर्श और व्यक्तिगत उपचार योजनाएं प्राप्त करें।",
+      available: "उपलब्ध",
+      reviews: "समीक्षाएं",
+      call: "कॉल",
+      book: "बुक",
+    },
+  };
+
+  const text = translations[language];
+
   return (
     <section id="specialists" className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Find a Specialist
+            {text.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Connect with top-rated bone health specialists near you. Get expert 
-            consultations and personalized treatment plans.
+            {text.subtitle}
           </p>
         </div>
 
@@ -76,7 +99,7 @@ export function SpecialistsSection() {
                   />
                   {doctor.available && (
                     <span className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-1 px-2 py-0.5 text-xs font-medium bg-success text-success-foreground rounded-full">
-                      Available
+                      {text.available}
                     </span>
                   )}
                 </div>
@@ -84,10 +107,10 @@ export function SpecialistsSection() {
                 {/* Doctor Info */}
                 <div className="text-center mb-4">
                   <h3 className="font-semibold text-foreground">{doctor.name}</h3>
-                  <p className="text-sm text-primary">{doctor.specialty}</p>
+                  <p className="text-sm text-primary">{doctor.specialty[language]}</p>
                   <div className="flex items-center justify-center gap-1 mt-2 text-sm text-muted-foreground">
                     <MapPin className="w-3 h-3" />
-                    {doctor.location}
+                    {doctor.location[language]}
                   </div>
                 </div>
 
@@ -96,7 +119,7 @@ export function SpecialistsSection() {
                   <Star className="w-4 h-4 fill-warning text-warning" />
                   <span className="font-medium text-foreground">{doctor.rating}</span>
                   <span className="text-sm text-muted-foreground">
-                    ({doctor.reviews} reviews)
+                    ({doctor.reviews} {text.reviews})
                   </span>
                 </div>
 
@@ -104,11 +127,11 @@ export function SpecialistsSection() {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="flex-1">
                     <Phone className="w-4 h-4 mr-1" />
-                    Call
+                    {text.call}
                   </Button>
                   <Button size="sm" className="flex-1">
                     <Calendar className="w-4 h-4 mr-1" />
-                    Book
+                    {text.book}
                   </Button>
                 </div>
               </CardContent>
