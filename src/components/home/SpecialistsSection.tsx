@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Phone, Calendar, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import drSanjayImage from "@/assets/dr-sanjay-bhadada.png";
+import drSameerImage from "@/assets/dr-sameer-aggarwal.png";
+import drVijayImage from "@/assets/dr-vijay-goni.png";
 
 const specialists = [
   {
@@ -12,7 +15,7 @@ const specialists = [
     rating: 4.9,
     reviews: 312,
     available: true,
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop&crop=face",
+    image: drSanjayImage,
   },
   {
     id: 2,
@@ -22,7 +25,7 @@ const specialists = [
     rating: 4.8,
     reviews: 245,
     available: true,
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
+    image: drSameerImage,
   },
   {
     id: 3,
@@ -32,7 +35,7 @@ const specialists = [
     rating: 4.9,
     reviews: 278,
     available: true,
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    image: drVijayImage,
   },
 ];
 
