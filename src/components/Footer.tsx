@@ -46,6 +46,11 @@ export function Footer() {
                   {t("footer.faqs")}
                 </a>
               </li>
+              <li>
+                <Link to="/report-issue" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  {t("footer.reportIssue")}
+                </Link>
+              </li>
             </ul>
           </div>
 

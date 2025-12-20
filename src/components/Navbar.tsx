@@ -13,6 +13,7 @@ export function Navbar() {
     { name: t("nav.home"), path: "/" },
     { name: t("nav.education"), path: "/education" },
     { name: t("nav.assessment"), path: "/sarcopenia-assessment" },
+    { name: t("nav.reportIssue"), path: "/report-issue" },
   ];
 
   const toggleLanguage = () => {

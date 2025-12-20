@@ -16,6 +16,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.home": "Home",
     "nav.education": "Education Center",
     "nav.assessment": "Sarcopenia Assessment",
+    "nav.reportIssue": "Report Issue",
     "nav.getStarted": "Get Started",
     
     // Hero Section
@@ -74,6 +75,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.findSpecialist": "Find a Specialist",
     "footer.faqs": "FAQs",
     "footer.contact": "Contact",
+    "footer.reportIssue": "Report Issue",
     "footer.rights": "All rights reserved.",
     
     // Specialists Section
@@ -85,6 +87,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.home": "होम",
     "nav.education": "शिक्षा केंद्र",
     "nav.assessment": "सार्कोपेनिया मूल्यांकन",
+    "nav.reportIssue": "समस्या बताएं",
     "nav.getStarted": "शुरू करें",
     
     // Hero Section
@@ -143,6 +146,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.findSpecialist": "विशेषज्ञ खोजें",
     "footer.faqs": "सामान्य प्रश्न",
     "footer.contact": "संपर्क",
+    "footer.reportIssue": "समस्या बताएं",
     "footer.rights": "सर्वाधिकार सुरक्षित।",
     
     // Specialists Section
