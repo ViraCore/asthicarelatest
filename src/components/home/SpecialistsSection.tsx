@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Phone, Calendar, MapPin } from "lucide-react";
+import { Phone, Calendar, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import drSanjayImage from "@/assets/dr-sanjay-bhadada.png";
 import drSameerImage from "@/assets/dr-sameer-aggarwal.png";
@@ -12,8 +12,6 @@ const specialists = [
     name: "Dr. Sanjay Kumar Bhadada",
     specialty: { en: "Endocrinologist", hi: "एंडोक्राइनोलॉजिस्ट" },
     location: { en: "PGIMER, Chandigarh", hi: "पीजीआईएमईआर, चंडीगढ़" },
-    rating: 4.9,
-    reviews: 312,
     available: true,
     image: drSanjayImage,
   },
@@ -22,8 +20,6 @@ const specialists = [
     name: "Dr. Sameer Aggarwal",
     specialty: { en: "Orthopaedics", hi: "आर्थोपेडिक्स" },
     location: { en: "PGIMER, Chandigarh", hi: "पीजीआईएमईआर, चंडीगढ़" },
-    rating: 4.8,
-    reviews: 245,
     available: true,
     image: drSameerImage,
   },
@@ -32,8 +28,6 @@ const specialists = [
     name: "Dr. Vijay Goni",
     specialty: { en: "Orthopaedics", hi: "आर्थोपेडिक्स" },
     location: { en: "PGIMER, Chandigarh", hi: "पीजीआईएमईआर, चंडीगढ़" },
-    rating: 4.9,
-    reviews: 278,
     available: true,
     image: drVijayImage,
   },
@@ -47,7 +41,6 @@ export function SpecialistsSection() {
       title: "Find a Specialist",
       subtitle: "Connect with top-rated bone health specialists near you. Get expert consultations and personalized treatment plans.",
       available: "Available",
-      reviews: "reviews",
       call: "Call",
       book: "Book",
     },
@@ -55,7 +48,6 @@ export function SpecialistsSection() {
       title: "विशेषज्ञ खोजें",
       subtitle: "अपने पास के शीर्ष-रेटेड हड्डी स्वास्थ्य विशेषज्ञों से जुड़ें। विशेषज्ञ परामर्श और व्यक्तिगत उपचार योजनाएं प्राप्त करें।",
       available: "उपलब्ध",
-      reviews: "समीक्षाएं",
       call: "कॉल",
       book: "बुक",
     },
@@ -107,14 +99,6 @@ export function SpecialistsSection() {
                   </div>
                 </div>
 
-                {/* Rating */}
-                <div className="flex items-center justify-center gap-1 mb-4">
-                  <Star className="w-4 h-4 fill-warning text-warning" />
-                  <span className="font-medium text-foreground">{doctor.rating}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ({doctor.reviews} {text.reviews})
-                  </span>
-                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
