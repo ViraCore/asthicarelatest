@@ -47,8 +47,8 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <Link to="/report-issue" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  {t("footer.reportIssue")}
+                <Link to="/follow-up" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  {t("footer.followUp")}
                 </Link>
               </li>
             </ul>
