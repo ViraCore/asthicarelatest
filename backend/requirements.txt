@@ -26,3 +26,6 @@ typer>=0.9.0
 twilio==9.0.4
 sendgrid==6.11.0
 slowapi==0.1.9
+starkbank-ecdsa==2.2.0
+python-http-client>=3.2.1
+starkbank-ecdsa==2.2.0
