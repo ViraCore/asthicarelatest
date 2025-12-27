@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,11 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict
 import uuid
 from datetime import datetime
+from utils.sms_service import send_sms
+from utils.email_service import send_email
 
 
 ROOT_DIR = Path(__file__).parent
@@ -35,6 +37,17 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Notification Models
+class SMSRequest(BaseModel):
+    phone: str
+    patient_name: str
+    appointment_date: str
+
+class EmailRequest(BaseModel):
+    email: str
+    patient_name: str
+    appointment_date: str
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
@@ -51,6 +64,54 @@ async def create_status_check(input: StatusCheckCreate):
 async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
+
+# SMS Endpoint
+@api_router.post("/send-sms")
+async def send_sms_notification(request: SMSRequest) -> Dict:
+    """
+    Send SMS notification to patient.
+    """
+    try:
+        result = send_sms(
+            phone=request.phone,
+            patient_name=request.patient_name,
+            appointment_date=request.appointment_date
+        )
+        
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to send SMS"))
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in send_sms_notification endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+# Email Endpoint
+@api_router.post("/send-email")
+async def send_email_notification(request: EmailRequest) -> Dict:
+    """
+    Send email notification to patient.
+    """
+    try:
+        result = send_email(
+            email=request.email,
+            patient_name=request.patient_name,
+            appointment_date=request.appointment_date
+        )
+        
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to send email"))
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in send_email_notification endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 # Include the router in the main app
 app.include_router(api_router)
