@@ -11,6 +11,7 @@ import { Upload, FileText, Calendar, AlertCircle, User, Phone, CheckCircle2 } fr
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { format, addDays } from "date-fns";
+import { sendSMS, sendEmail } from "@/services/notificationService";
 
 const ReportIssue = () => {
   const { language } = useLanguage();
