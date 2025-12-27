@@ -7,7 +7,7 @@
 **Key Requirements:**
 - Send notifications when patients confirm their notification preferences
 - Support 3 options: Email Only, Phone Only, or Both
-- Use Android SMS Gateway app (your phone as gateway) for SMS
+- Use Twilio SMS API for reliable SMS delivery
 - Use SendGrid for email notifications
 - All API keys secured in backend `.env` file
 - Zero secrets exposed to frontend
@@ -32,10 +32,9 @@
 │  • POST /api/send-email                                      │
 │                                                               │
 │  ✅ Environment Variables (.env):                            │
-│  • SMS_GATEWAY_URL                                           │
-│  • SMS_API_KEY                                               │
-│  • SMS_DEVICE_ID                                             │
-│  • GATEWAY_PHONE_NUMBER                                      │
+│  • TWILIO_ACCOUNT_SID                                        │
+│  • TWILIO_AUTH_TOKEN                                         │
+│  • TWILIO_PHONE_NUMBER                                       │
 │  • SENDGRID_API_KEY                                          │
 │  • SENDGRID_FROM_EMAIL                                       │
 │                                                               │
@@ -43,14 +42,14 @@
 │  • Phone/Email validation                                    │
 │  • Rate limiting (prevent abuse)                             │
 │  • Error handling                                            │
-│  • Async HTTP calls                                          │
+│  • Async SMS/Email sending                                   │
 └────────┬─────────────────────────┬─────────────────────────┘
          │                         │
          │                         │
 ┌────────▼──────────┐     ┌───────▼──────────┐
-│  SMS Gateway      │     │    SendGrid      │
-│  (Your Phone)     │     │    Email API     │
-│  Android App      │     │                  │
+│   Twilio SMS      │     │    SendGrid      │
+│   API (Cloud)     │     │    Email API     │
+│                   │     │                  │
 └───────────────────┘     └──────────────────┘
          │                         │
          │                         │
@@ -75,16 +74,17 @@ Add the following variables (you'll fill in actual values):
 
 ```env
 # ============================================
-# SMS Gateway Configuration (Android SMS Gateway App)
+# Twilio SMS Configuration
 # ============================================
-SMS_GATEWAY_URL=https://your-gateway-url.com/send
-SMS_API_KEY=your_sms_api_key_here
-SMS_DEVICE_ID=your_device_id_here
-GATEWAY_PHONE_NUMBER=+1234567890
+# Get these from: https://console.twilio.com/
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token_here
+TWILIO_PHONE_NUMBER=+1234567890  # Your Twilio phone number
 
 # ============================================
 # SendGrid Configuration
 # ============================================
+# Get this from: https://app.sendgrid.com/settings/api_keys
 SENDGRID_API_KEY=SG.your_sendgrid_api_key_here
 SENDGRID_FROM_EMAIL=noreply@asthicare.com
 SENDGRID_FROM_NAME=Asthi Care
@@ -101,7 +101,7 @@ EMAIL_RATE_LIMIT=10  # Max emails per hour per user
 Add these dependencies:
 
 ```txt
-httpx==0.27.0           # Async HTTP client for SMS gateway
+twilio==9.0.4           # Twilio Python SDK for SMS
 sendgrid==6.11.0        # SendGrid Python SDK
 slowapi==0.1.9          # Rate limiting middleware
 python-dotenv==1.0.1    # Already present, but ensure it's there
@@ -123,6 +123,7 @@ pip install -r requirements.txt
 - [ ] `.env` file is in `.gitignore`
 - [ ] No API keys in code
 - [ ] All secrets loaded via `os.environ.get()`
+- [ ] Twilio credentials secured in backend only
 
 ---
 
@@ -139,20 +140,22 @@ Create file: `backend/utils/sms_service.py`
 **Functions:**
 - `validate_phone_number(phone: str) -> bool`
 - `send_sms(phone: str, message: str) -> dict`
-- Handle Android SMS Gateway API integration
+- Use Twilio Python SDK for SMS sending
 - Error handling and logging
 
-**SMS Gateway API Format (typically):**
+**Twilio Integration:**
 ```python
-POST https://your-gateway-url.com/send
-Headers:
-  - Authorization: Bearer {SMS_API_KEY}
-Body:
-  {
-    "phone": "+1234567890",
-    "message": "Your message here",
-    "device_id": "your_device_id"
-  }
+from twilio.rest import Client
+
+# Initialize Twilio client
+client = Client(account_sid, auth_token)
+
+# Send SMS
+message = client.messages.create(
+    body="Your message here",
+    from_=twilio_phone_number,
+    to=recipient_phone_number
+)
 ```
 
 #### 2.2 Add SMS Endpoint to `backend/server.py`
@@ -596,7 +599,7 @@ Add testing data:
 user_problem_statement: "Integrate SMS and Email notifications for follow-up appointment confirmations"
 
 backend:
-  - task: "SMS Gateway Integration (Android SMS Gateway)"
+  - task: "Twilio SMS Integration"
     implemented: true
     working: true  # Update after testing
     file: "backend/server.py, backend/utils/sms_service.py"
@@ -606,7 +609,7 @@ backend:
     status_history:
       - working: true
         agent: "main"
-        comment: "SMS endpoint created with rate limiting and validation"
+        comment: "Twilio SMS endpoint created with rate limiting and validation"
   
   - task: "SendGrid Email Integration"
     implemented: true
@@ -650,7 +653,7 @@ test_plan:
 
 agent_communication:
   - agent: "main"
-    message: "SMS and Email notification system implemented. All API keys secured in backend .env. Ready for testing."
+    message: "Twilio SMS and SendGrid Email notification system implemented. All API keys secured in backend .env. Ready for testing."
 ```
 
 ### Deliverables:
@@ -772,8 +775,8 @@ User Action: Click "Confirm Preferences"
          │                     │
          ▼                     ▼
 ┌──────────────────┐  ┌──────────────────┐
-│  SendGrid API    │  │  SMS Gateway API │
-│  (Email Service) │  │  (Your Phone)    │
+│  SendGrid API    │  │   Twilio SMS     │
+│  (Email Service) │  │   API (Cloud)    │
 └────────┬─────────┘  └────────┬─────────┘
          │                     │
          ▼                     ▼
@@ -958,17 +961,18 @@ DB_NAME=your_database_name
 CORS_ORIGINS=*
 
 # ============================================
-# NEW: SMS Gateway Configuration
+# NEW: Twilio SMS Configuration
 # ============================================
-# Android SMS Gateway App Configuration
-# Get these from: https://smsgateway.me/dashboard (or your SMS gateway provider)
-SMS_GATEWAY_URL=https://smsgateway.me/api/v4/message/send
-SMS_API_KEY=your_actual_api_key_here
-SMS_DEVICE_ID=your_actual_device_id_here
+# Get these from: https://console.twilio.com/
+# Account SID: Found on Twilio Dashboard
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Your phone number that acts as the SMS gateway
+# Auth Token: Found on Twilio Dashboard (keep this secret!)
+TWILIO_AUTH_TOKEN=your_actual_twilio_auth_token_here
+
+# Your Twilio phone number (must be verified in Twilio)
 # Format: +[country_code][phone_number] (e.g., +11234567890)
-GATEWAY_PHONE_NUMBER=+1234567890
+TWILIO_PHONE_NUMBER=+1234567890
 
 # ============================================
 # NEW: SendGrid Email Configuration
@@ -1020,10 +1024,42 @@ When you're ready to begin implementation:
 
 ## 📞 Support Resources
 
-### Android SMS Gateway Apps:
-- **SMS Gateway ME:** https://smsgateway.me/
-- **SMS Gateway API:** https://smsgateway.me/sms-api-documentation
-- **Alternative:** https://github.com/bogkonstantin/android_income_sms_gateway_webhook
+### Twilio Setup Guide:
+
+#### Step 1: Create Twilio Account
+1. Go to https://www.twilio.com/try-twilio
+2. Sign up for a free trial account
+3. Verify your email and phone number
+
+#### Step 2: Get Your Credentials
+1. Login to https://console.twilio.com/
+2. Find your **Account SID** and **Auth Token** on the dashboard
+3. Copy these values - you'll add them to `.env`
+
+#### Step 3: Get a Twilio Phone Number
+1. In the console, go to **Phone Numbers** > **Manage** > **Buy a number**
+2. For trial accounts: You get 1 free phone number
+3. Select a number with SMS capability
+4. Note: Trial accounts can only send SMS to verified phone numbers
+
+#### Step 4: Verify Test Phone Numbers (Trial Account)
+1. Go to **Phone Numbers** > **Manage** > **Verified Caller IDs**
+2. Add phone numbers you want to test with
+3. Verify them via SMS code
+
+**Twilio Free Trial Includes:**
+- $15 USD trial credit
+- 1 free phone number
+- Can send SMS to verified numbers only
+- Upgrade to paid plan to send to any number
+
+### Twilio Resources:
+- **Sign Up (Free Trial):** https://www.twilio.com/try-twilio
+- **Console Dashboard:** https://console.twilio.com/
+- **API Documentation:** https://www.twilio.com/docs/sms
+- **Python SDK:** https://www.twilio.com/docs/libraries/python
+- **Pricing:** https://www.twilio.com/sms/pricing
+- **Free Trial Info:** https://www.twilio.com/docs/usage/tutorials/how-to-use-your-free-trial-account
 
 ### SendGrid Resources:
 - **API Documentation:** https://docs.sendgrid.com/api-reference
@@ -1041,8 +1077,9 @@ When you're ready to begin implementation:
 
 Before starting Phase 1, ensure you have:
 
-- [ ] Android SMS Gateway app installed on your phone
-- [ ] SMS Gateway API credentials ready (URL, API key, device ID)
+- [ ] Twilio account created (free trial available)
+- [ ] Twilio phone number purchased/verified
+- [ ] Twilio Account SID and Auth Token ready
 - [ ] SendGrid account created
 - [ ] SendGrid API key generated (with "Mail Send" permissions)
 - [ ] SendGrid sender email verified
