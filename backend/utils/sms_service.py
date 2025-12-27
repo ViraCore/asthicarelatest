@@ -8,20 +8,67 @@ from twilio.base.exceptions import TwilioRestException
 logger = logging.getLogger(__name__)
 
 
-def validate_phone_number(phone: str) -> bool:
+def normalize_phone_number(phone: str) -> str:
     """
-    Validate phone number format.
-    Accepts international format with country code.
+    Normalize phone number to E.164 format required by Twilio.
+    Adds '+' prefix if missing.
+    
+    Args:
+        phone: Phone number string
+        
+    Returns:
+        Phone number in E.164 format (with + prefix)
     """
     if not phone:
-        return False
+        return phone
     
     # Remove spaces, dashes, parentheses
     cleaned = re.sub(r'[\s\-\(\)]', '', phone)
     
-    # Check if it starts with + and has 10-15 digits
-    pattern = r'^\+?[1-9]\d{9,14}$'
-    return bool(re.match(pattern, cleaned))
+    # Add '+' prefix if not present
+    if not cleaned.startswith('+'):
+        cleaned = '+' + cleaned
+    
+    return cleaned
+
+
+def validate_phone_number(phone: str) -> tuple[bool, str]:
+    """
+    Validate phone number format with detailed error messages.
+    Accepts international format with country code.
+    
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    if not phone:
+        return False, "Phone number is required"
+    
+    # Remove spaces, dashes, parentheses
+    cleaned = re.sub(r'[\s\-\(\)]', '', phone)
+    
+    # Remove + for digit counting
+    digits_only = cleaned.lstrip('+')
+    
+    # Check basic format
+    if not re.match(r'^\+?[1-9]\d{9,14}$', cleaned):
+        return False, "Phone number must be in international format with country code (10-15 digits)"
+    
+    # Specific validation for common country codes
+    if digits_only.startswith('966'):  # Saudi Arabia
+        if len(digits_only) != 12:  # 966 + 9 digits
+            return False, f"Saudi Arabian numbers require 9 digits after country code (966). Your number has {len(digits_only) - 3} digits. Example: +966501234567"
+        if digits_only[3] not in ['5', '1']:  # Mobile or landline
+            return False, "Saudi Arabian numbers should start with 5 (mobile) or 1 (landline) after country code"
+    
+    elif digits_only.startswith('91'):  # India
+        if len(digits_only) != 12:  # 91 + 10 digits
+            return False, f"Indian numbers require 10 digits after country code (91). Your number has {len(digits_only) - 2} digits. Example: +919876543210"
+    
+    elif digits_only.startswith('1'):  # US/Canada
+        if len(digits_only) != 11:  # 1 + 10 digits
+            return False, f"US/Canadian numbers require 10 digits after country code (1). Your number has {len(digits_only) - 1} digits. Example: +14155551234"
+    
+    return True, ""
 
 
 def send_sms(phone: str, patient_name: str, appointment_date: str) -> Dict:
@@ -38,12 +85,17 @@ def send_sms(phone: str, patient_name: str, appointment_date: str) -> Dict:
     """
     try:
         # Validate phone number
-        if not validate_phone_number(phone):
-            logger.warning(f"Invalid phone number format: {phone}")
+        is_valid, error_message = validate_phone_number(phone)
+        if not is_valid:
+            logger.warning(f"Invalid phone number format: {phone} - {error_message}")
             return {
                 "success": False,
-                "error": "Invalid phone number format"
+                "error": error_message
             }
+        
+        # Normalize phone number to E.164 format (add + if missing)
+        normalized_phone = normalize_phone_number(phone)
+        logger.info(f"Normalized phone number from {phone} to {normalized_phone}")
         
         # Load Twilio credentials from environment
         account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -72,19 +124,20 @@ Please arrive 10 minutes early. Reply STOP to unsubscribe.
 
 - Asthi Care Team"""
         
-        # Send SMS
+        # Send SMS using normalized phone number
+        logger.info(f"Attempting to send SMS - From: {from_number}, To: {normalized_phone}")
         message = client.messages.create(
             body=message_body,
             from_=from_number,
-            to=phone
+            to=normalized_phone
         )
         
-        logger.info(f"SMS sent successfully to {phone}, SID: {message.sid}")
+        logger.info(f"SMS sent successfully to {normalized_phone}, SID: {message.sid}")
         
         return {
             "success": True,
             "message": "SMS sent successfully",
-            "phone": phone,
+            "phone": normalized_phone,
             "sid": message.sid
         }
         
