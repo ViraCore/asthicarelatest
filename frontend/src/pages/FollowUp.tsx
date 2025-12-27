@@ -74,6 +74,10 @@ const ReportIssue = () => {
       confirmPreferences: "Confirm Preferences",
       confirming: "Confirming...",
       preferencesSuccess: "Your notification preferences have been saved successfully!",
+      notificationError: "Failed to send notification. Please try again.",
+      emailSentSuccess: "Email notification sent successfully!",
+      smsSentSuccess: "SMS notification sent successfully!",
+      bothSentSuccess: "Email and SMS notifications sent successfully!",
       
       // Report Concern
       concernTitle: "Report a Concern",
@@ -128,6 +132,10 @@ const ReportIssue = () => {
       confirmPreferences: "प्राथमिकताएं पुष्टि करें",
       confirming: "पुष्टि हो रही है...",
       preferencesSuccess: "आपकी सूचना प्राथमिकताएं सफलतापूर्वक सहेजी गई हैं!",
+      notificationError: "सूचना भेजने में विफल। कृपया पुनः प्रयास करें।",
+      emailSentSuccess: "ईमेल सूचना सफलतापूर्वक भेजी गई!",
+      smsSentSuccess: "SMS सूचना सफलतापूर्वक भेजी गई!",
+      bothSentSuccess: "ईमेल और SMS सूचनाएं सफलतापूर्वक भेजी गईं!",
       
       // Report Concern
       concernTitle: "चिंता बताएं",
@@ -185,16 +193,59 @@ const ReportIssue = () => {
     
     setIsConfirmingPreference(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Success!",
-      description: text.preferencesSuccess,
-      variant: "default",
-    });
-    
-    setIsConfirmingPreference(false);
+    try {
+      const appointmentDateFormatted = format(appointmentDate, "EEEE, MMMM d, yyyy");
+      
+      // Prepare notification data
+      const smsData = {
+        phone: patientPhone,
+        patient_name: patientName,
+        appointment_date: appointmentDateFormatted,
+      };
+      
+      const emailData = {
+        email: patientEmail,
+        patient_name: patientName,
+        appointment_date: appointmentDateFormatted,
+      };
+      
+      // Send notifications based on preference
+      if (notificationPreference === 'email') {
+        await sendEmail(emailData);
+        toast({
+          title: "Success!",
+          description: text.emailSentSuccess,
+          variant: "default",
+        });
+      } else if (notificationPreference === 'phone') {
+        await sendSMS(smsData);
+        toast({
+          title: "Success!",
+          description: text.smsSentSuccess,
+          variant: "default",
+        });
+      } else if (notificationPreference === 'both') {
+        // Send both in parallel
+        await Promise.all([
+          sendEmail(emailData),
+          sendSMS(smsData)
+        ]);
+        toast({
+          title: "Success!",
+          description: text.bothSentSuccess,
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Notification error:", error);
+      toast({
+        title: "Error",
+        description: text.notificationError,
+        variant: "destructive",
+      });
+    } finally {
+      setIsConfirmingPreference(false);
+    }
   };
 
   const calculateDaysUntil = () => {
