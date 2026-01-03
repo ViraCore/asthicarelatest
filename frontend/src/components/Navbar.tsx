@@ -29,7 +29,7 @@ export function Navbar() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Activity className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">Asthi Care</span>
+            <span className="text-l font-bold text-foreground">Asthi Care<br />अस्थि केयर</span>
           </Link>
 
           {/* Desktop Navigation */}

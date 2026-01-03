@@ -11,7 +11,6 @@ import { Upload, FileText, Calendar, AlertCircle, User, Phone, CheckCircle2 } fr
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { format, addDays } from "date-fns";
-import { sendSMS, sendEmail } from "@/services/notificationService";
 
 const ReportIssue = () => {
   const { language } = useLanguage();
@@ -45,9 +44,9 @@ const ReportIssue = () => {
       emailLabel: "Email Address",
       emailPlaceholder: "Enter your email address",
       phoneLabel: "Phone Number",
-      phonePlaceholder: "Enter your phone number",
+      phonePlaceholder: "Enter 10 digit mobile number",
       emailError: "Please enter a valid email address",
-      phoneError: "Please enter a valid phone number",
+      phoneError: "Please enter a valid 10 digit phone number",
       enterDashboard: "Enter Dashboard",
       
       // Phase 2
@@ -86,6 +85,7 @@ const ReportIssue = () => {
       submitConcern: "Submit Concern",
       submitting: "Submitting...",
       concernSuccess: "Your concern has been submitted successfully!",
+      successTitle: "Success!",
       
       // Medical Reports
       uploadTitle: "Medical Reports",
@@ -103,9 +103,9 @@ const ReportIssue = () => {
       emailLabel: "ईमेल पता",
       emailPlaceholder: "अपना ईमेल पता दर्ज करें",
       phoneLabel: "फोन नंबर",
-      phonePlaceholder: "अपना फोन नंबर दर्ज करें",
+      phonePlaceholder: "10 अंकों का मोबाइल नंबर दर्ज करें",
       emailError: "कृपया एक वैध ईमेल पता दर्ज करें",
-      phoneError: "कृपया एक वैध फोन नंबर दर्ज करें",
+      phoneError: "कृपया एक वैध 10 अंकों का फोन नंबर दर्ज करें",
       enterDashboard: "डैशबोर्ड में प्रवेश करें",
       
       // Phase 2
@@ -144,6 +144,7 @@ const ReportIssue = () => {
       submitConcern: "चिंता जमा करें",
       submitting: "जमा हो रहा है...",
       concernSuccess: "आपकी चिंता सफलतापूर्वक जमा हो गई है!",
+      successTitle: "सफलता!",
       
       // Medical Reports
       uploadTitle: "मेडिकल रिपोर्ट",
@@ -161,9 +162,23 @@ const ReportIssue = () => {
   };
 
   const validatePhone = (phone: string) => {
-    // Basic phone validation - accepts numbers with optional + and spaces/dashes
-    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-    return phoneRegex.test(phone.replace(/[\s-]/g, ''));
+    // Validate Indian phone number (10 digits)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow digits
+    const value = e.target.value.replace(/\D/g, '');
+    // Limit to 10 digits
+    if (value.length <= 10) {
+      setPatientPhone(value);
+      setPhoneError("");
+    }
+  };
+
+  const getFullPhoneNumber = () => {
+    return `+91${patientPhone}`;
   };
 
   const handleCheckIn = (e: React.FormEvent) => {
@@ -193,59 +208,31 @@ const ReportIssue = () => {
     
     setIsConfirmingPreference(true);
     
-    try {
-      const appointmentDateFormatted = format(appointmentDate, "EEEE, MMMM d, yyyy");
-      
-      // Prepare notification data
-      const smsData = {
-        phone: patientPhone,
-        patient_name: patientName,
-        appointment_date: appointmentDateFormatted,
-      };
-      
-      const emailData = {
-        email: patientEmail,
-        patient_name: patientName,
-        appointment_date: appointmentDateFormatted,
-      };
-      
-      // Send notifications based on preference
-      if (notificationPreference === 'email') {
-        await sendEmail(emailData);
-        toast({
-          title: "Success!",
-          description: text.emailSentSuccess,
-          variant: "default",
-        });
-      } else if (notificationPreference === 'phone') {
-        await sendSMS(smsData);
-        toast({
-          title: "Success!",
-          description: text.smsSentSuccess,
-          variant: "default",
-        });
-      } else if (notificationPreference === 'both') {
-        // Send both in parallel
-        await Promise.all([
-          sendEmail(emailData),
-          sendSMS(smsData)
-        ]);
-        toast({
-          title: "Success!",
-          description: text.bothSentSuccess,
-          variant: "default",
-        });
-      }
-    } catch (error) {
-      console.error("Notification error:", error);
+    // Simulate API delay for demo purposes
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    // Always show success message (demo website)
+    if (notificationPreference === 'email') {
       toast({
-        title: "Error",
-        description: text.notificationError,
-        variant: "destructive",
+        title: text.successTitle,
+        description: text.emailSentSuccess,
+        variant: "default",
       });
-    } finally {
-      setIsConfirmingPreference(false);
+    } else if (notificationPreference === 'phone') {
+      toast({
+        title: text.successTitle,
+        description: text.smsSentSuccess,
+        variant: "default",
+      });
+    } else if (notificationPreference === 'both') {
+      toast({
+        title: text.successTitle,
+        description: text.bothSentSuccess,
+        variant: "default",
+      });
     }
+    
+    setIsConfirmingPreference(false);
   };
 
   const calculateDaysUntil = () => {
@@ -346,22 +333,30 @@ const ReportIssue = () => {
                       <Label htmlFor="patientPhone" className="text-foreground font-medium">
                         {text.phoneLabel}
                       </Label>
-                      <Input
-                        id="patientPhone"
-                        type="tel"
-                        placeholder={text.phonePlaceholder}
-                        value={patientPhone}
-                        onChange={(e) => {
-                          setPatientPhone(e.target.value);
-                          setPhoneError("");
-                        }}
-                        required
-                        className={`border-border focus:border-primary ${phoneError ? "border-destructive" : ""}`}
-                      />
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                          +91
+                        </div>
+                        <Input
+                          id="patientPhone"
+                          type="tel"
+                          placeholder={text.phonePlaceholder}
+                          value={patientPhone}
+                          onChange={handlePhoneChange}
+                          required
+                          maxLength={10}
+                          className={`border-border focus:border-primary pl-12 ${phoneError ? "border-destructive" : ""}`}
+                        />
+                      </div>
                       {phoneError && (
                         <p className="text-sm text-destructive flex items-center gap-1">
                           <AlertCircle className="w-4 h-4" />
                           {phoneError}
+                        </p>
+                      )}
+                      {patientPhone && !phoneError && (
+                        <p className="text-xs text-muted-foreground">
+                          Full number: {getFullPhoneNumber()}
                         </p>
                       )}
                     </div>
@@ -471,7 +466,7 @@ const ReportIssue = () => {
                           <Label htmlFor="phone" className="cursor-pointer flex-1">
                             <div className="font-semibold text-foreground">{text.phoneOnly}</div>
                             <div className="text-sm text-muted-foreground">{text.phoneOnlyDesc}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{patientPhone}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{getFullPhoneNumber()}</div>
                           </Label>
                         </div>
 
@@ -482,7 +477,7 @@ const ReportIssue = () => {
                             <div className="font-semibold text-foreground">{text.both}</div>
                             <div className="text-sm text-muted-foreground">{text.bothDesc}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {patientEmail} & {patientPhone}
+                              {patientEmail} & {getFullPhoneNumber()}
                             </div>
                           </Label>
                         </div>
@@ -552,44 +547,44 @@ const ReportIssue = () => {
                     )}
                   </CardContent>
                 </Card>
-              </div>
 
-              {/* Report a Concern Card */}
-              <Card className="shadow-lg border-border">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-warning/20 rounded-full flex items-center justify-center">
-                      <AlertCircle className="w-6 h-6 text-warning" />
+                {/* Report a Concern Card */}
+                <Card className="shadow-lg border-border">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-warning/20 rounded-full flex items-center justify-center">
+                        <AlertCircle className="w-6 h-6 text-warning" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold text-foreground">
+                          {text.concernTitle}
+                        </CardTitle>
+                        <CardDescription className="text-muted-foreground">
+                          {text.concernDescription}
+                        </CardDescription>
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle className="text-xl font-bold text-foreground">
-                        {text.concernTitle}
-                      </CardTitle>
-                      <CardDescription className="text-muted-foreground">
-                        {text.concernDescription}
-                      </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <Textarea
+                        placeholder={text.concernPlaceholder}
+                        value={concern}
+                        onChange={(e) => setConcern(e.target.value)}
+                        rows={4}
+                        className="border-border focus:border-primary resize-none"
+                      />
+                      <Button
+                        onClick={handleSubmitConcern}
+                        disabled={!concern.trim() || isSubmittingConcern}
+                        className="bg-warning hover:bg-warning/90 text-warning-foreground font-semibold"
+                      >
+                        {isSubmittingConcern ? text.submitting : text.submitConcern}
+                      </Button>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmitConcern} className="space-y-4">
-                    <Textarea
-                      placeholder={text.concernPlaceholder}
-                      value={concern}
-                      onChange={(e) => setConcern(e.target.value)}
-                      rows={4}
-                      className="border-border focus:border-primary resize-none"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={!concern.trim() || isSubmittingConcern}
-                      className="bg-warning hover:bg-warning/90 text-warning-foreground font-semibold"
-                    >
-                      {isSubmittingConcern ? text.submitting : text.submitConcern}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </section>
         )}

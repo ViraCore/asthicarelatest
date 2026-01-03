@@ -154,3 +154,4 @@ Please arrive 10 minutes early. Reply STOP to unsubscribe.
             "success": False,
             "error": "Failed to send SMS. Please try again."
         }
+        

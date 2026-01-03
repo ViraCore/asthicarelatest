@@ -29,50 +29,7 @@ const videos: Video[] = [
     views: 85000,
     rating: 4.9,
   },
-  {
-    id: 2,
-    youtubeId: "I76Zzsdbz1E",
-    title: {
-      en: "Calcium and Vitamin D for Strong Bones",
-      hi: "मजबूत हड्डियों के लिए कैल्शियम और विटामिन डी",
-    },
-    category: "Nutrition",
-    views: 120000,
-    rating: 4.8,
-  },
-  {
-    id: 3,
-    youtubeId: "lteg1OCrkiM",
-    title: {
-      en: "Exercises for Bone Strength and Balance",
-      hi: "हड्डियों की मजबूती और संतुलन के लिए व्यायाम",
-    },
-    category: "Exercise",
-    views: 95000,
-    rating: 4.9,
-  },
-  {
-    id: 4,
-    youtubeId: "1KB0nqoG4qo",
-    title: {
-      en: "Fall Prevention Tips for Elderly",
-      hi: "बुजुर्गों के लिए गिरने से बचाव के टिप्स",
-    },
-    category: "Fall Prevention",
-    views: 78000,
-    rating: 4.7,
-  },
-  {
-    id: 5,
-    youtubeId: "oNMtK7w0w7A",
-    title: {
-      en: "Post-Fracture Rehabilitation and Recovery",
-      hi: "फ्रैक्चर के बाद पुनर्वास और रिकवरी",
-    },
-    category: "Rehabilitation",
-    views: 67000,
-    rating: 4.8,
-  },
+  
 ];
 
 function formatViews(views: number): string {
