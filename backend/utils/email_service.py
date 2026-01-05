@@ -43,9 +43,9 @@ def get_email_html_template(patient_name: str, appointment_date: str) -> str:
       <h1 style="margin: 0;">Asthi Care</h1>
     </div>
     <div class="content">
-      <h2>Appointment Confirmation</h2>
+      <h2>Follow-Up Reminder</h2>
       <p>Dear {patient_name},</p>
-      <p>Your follow-up appointment has been confirmed!</p>
+      <p>Your follow-up appointment is scheduled for tomorrow!</p>
       
       <div class="appointment-box">
         <h3 style="margin-top: 0;">Appointment Details</h3>
@@ -119,11 +119,14 @@ def send_email(email: str, patient_name: str, appointment_date: str) -> Dict:
         
         logger.info(f"Email sent successfully to {email}, Status: {response.status_code}")
         
+        email_html = get_email_html_template(patient_name, appointment_date)
+
         return {
-            "success": True,
-            "message": "Email sent successfully",
-            "email": email,
-            "status_code": response.status_code
+          "success": True,
+          "message": "Email sent successfully",
+          "email": email,
+          "status_code": response.status_code,
+          "email_html": email_html,
         }
         
     except Exception as e:

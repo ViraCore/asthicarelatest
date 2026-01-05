@@ -133,12 +133,13 @@ Please arrive 10 minutes early. Reply STOP to unsubscribe.
         )
         
         logger.info(f"SMS sent successfully to {normalized_phone}, SID: {message.sid}")
-        
+
         return {
             "success": True,
             "message": "SMS sent successfully",
             "phone": normalized_phone,
-            "sid": message.sid
+            "sid": message.sid,
+            "message_body": message_body,
         }
         
     except TwilioRestException as e:

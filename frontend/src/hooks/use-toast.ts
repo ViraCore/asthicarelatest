@@ -156,6 +156,12 @@ function toast({ ...props }: Toast) {
     },
   });
 
+  // Debug: log when a toast is created
+  try {
+    // eslint-disable-next-line no-console
+    console.log('[use-toast] created toast', id, props.title ?? 'no-title');
+  } catch (e) {}
+
   return {
     id: id,
     dismiss,

@@ -4,6 +4,12 @@ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastVi
 export function Toaster() {
   const { toasts } = useToast();
 
+  // Debug: log toasts observed by Toaster
+  try {
+    // eslint-disable-next-line no-console
+    console.log('[Toaster] current toasts', toasts.length, toasts.map(t => ({ id: t.id, title: t.title })));
+  } catch (e) {}
+
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {

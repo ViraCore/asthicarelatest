@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Upload, FileText, Calendar, AlertCircle, User, Phone, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import { sendEmail, sendSMS } from "@/services/notificationService";
 import { format, addDays } from "date-fns";
 
 const ReportIssue = () => {
@@ -209,30 +210,46 @@ const ReportIssue = () => {
     setIsConfirmingPreference(true);
     
     // Simulate API delay for demo purposes
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Always show success message (demo website)
-    if (notificationPreference === 'email') {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    try {
+      if (notificationPreference === 'email' || notificationPreference === 'both') {
+        // call sendEmail which will also show a local preview toast
+        await sendEmail({
+          email: patientEmail,
+          patient_name: patientName,
+          appointment_date: format(appointmentDate, "EEEE, MMMM d, yyyy"),
+        });
+      }
+
+      if (notificationPreference === 'phone' || notificationPreference === 'both') {
+        // call sendSMS which will also show a local preview toast
+        await sendSMS({
+          phone: patientPhone,
+          patient_name: patientName,
+          appointment_date: format(appointmentDate, "EEEE, MMMM d, yyyy"),
+        });
+      }
+
+      // show combined success toast
       toast({
         title: text.successTitle,
-        description: text.emailSentSuccess,
+        description:
+          notificationPreference === 'both' ? text.bothSentSuccess : notificationPreference === 'email' ? text.emailSentSuccess : text.smsSentSuccess,
         variant: "default",
       });
-    } else if (notificationPreference === 'phone') {
+    } catch (err) {
+      console.error('Error sending notifications (ignored for demo):', err);
+      // Show success regardless (demo / offline mode)
       toast({
         title: text.successTitle,
-        description: text.smsSentSuccess,
+        description:
+          notificationPreference === 'both' ? text.bothSentSuccess : notificationPreference === 'email' ? text.emailSentSuccess : text.smsSentSuccess,
         variant: "default",
       });
-    } else if (notificationPreference === 'both') {
-      toast({
-        title: text.successTitle,
-        description: text.bothSentSuccess,
-        variant: "default",
-      });
+    } finally {
+      setIsConfirmingPreference(false);
     }
-    
-    setIsConfirmingPreference(false);
   };
 
   const calculateDaysUntil = () => {
