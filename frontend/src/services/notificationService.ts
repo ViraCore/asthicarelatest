@@ -1,5 +1,6 @@
 import * as React from "react";
 import { toast } from "@/hooks/use-toast";
+import { showEmailPreview } from "@/components/ui/emailPreviewModal";
 
 const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
@@ -71,6 +72,7 @@ export const sendEmail = async (data: EmailData) => {
   try {
     const emailNode = React.createElement('div', { dangerouslySetInnerHTML: { __html: localEmailHtml } });
     toast({ title: 'Email Preview', description: emailNode });
+    showEmailPreview(localEmailHtml, 'Email Preview');
   } catch (err) {
     console.warn('Unable to render local email preview in toast:', err);
   }
@@ -102,6 +104,8 @@ export const sendEmail = async (data: EmailData) => {
         title: 'Email Preview',
         description: emailNode,
       });
+      // Also display centered modal preview
+      showEmailPreview(result.email_html, 'Email Preview');
     } catch (err) {
       console.warn('Unable to render email preview in toast:', err);
     }
